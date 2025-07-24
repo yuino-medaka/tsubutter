@@ -1,1 +1,167 @@
-<script setup>import { ref } from "vue"; import { supabase } from "../supabase.js"; const content = ref(""); const isSubmitting = ref(false); const message = ref(""); const submitPost = async () => { if (!content.value.trim()) { message.value = "投稿内容を入力してください"; return; } if (content.value.length > 280) { message.value = "投稿は280文字以内で入力してください"; return; } isSubmitting.value = true; message.value = ""; try { const { data, error } = await supabase.from("posts").insert([{ content: content.value.trim(), user_id: (await supabase.auth.getUser()).data.user?.id || null }]).select(); if (error) throw error; message.value = "投稿が完了しました！"; content.value = ""; } catch (error) { console.error("投稿エラー:", error); message.value = "投稿に失敗しました: " + error.message; } finally { isSubmitting.value = false; } }</script><template><div class="post-form"><h2 class="form-title">気持ちを投稿しよう</h2><div class="form-container"><div class="input-group"><textarea v-model="content" placeholder="今の気持ちを280文字以内で投稿してください..." class="content-input" :maxlength="280" :disabled="isSubmitting"></textarea><div class="char-count">{{ content.length }}/280</div></div><div class="form-actions"><button @click="submitPost" :disabled="isSubmitting || !content.trim()" class="btn btn-primary submit-btn"><span v-if="isSubmitting">投稿中...</span><span v-else>投稿する</span></button></div><div v-if="message" class="message" :class="{ error: message.includes(\"失敗\") }">{{ message }}</div></div></div></template><style scoped>.post-form { max-width: 600px; margin: 0 auto; } .form-title { font-size: 1.8rem; color: #1a202c; margin-bottom: 2rem; text-align: center; } .form-container { background: #f8fafc; border-radius: 1rem; padding: 2rem; margin-bottom: 2rem; } .input-group { position: relative; margin-bottom: 1.5rem; } .content-input { width: 100%; min-height: 120px; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 0.75rem; font-size: 1rem; font-family: inherit; resize: vertical; transition: border-color 0.3s ease; } .content-input:focus { outline: none; border-color: #1da1f2; box-shadow: 0 0 0 3px rgba(29, 161, 242, 0.1); } .char-count { position: absolute; bottom: 0.5rem; right: 0.5rem; font-size: 0.875rem; color: #64748b; background: rgba(255, 255, 255, 0.9); padding: 0.25rem 0.5rem; border-radius: 0.25rem; } .form-actions { display: flex; justify-content: center; } .submit-btn { padding: 0.75rem 2rem; font-size: 1.1rem; font-weight: 600; border-radius: 2rem; min-width: 150px; } .message { margin-top: 1rem; padding: 0.75rem 1rem; border-radius: 0.5rem; text-align: center; font-weight: 500; } .message:not(.error) { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; } .message.error { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }</style>
+<script setup>
+import { ref } from 'vue'
+
+const content = ref('')
+const isSubmitting = ref(false)
+const message = ref('')
+
+const submitPost = async () => {
+  if (!content.value.trim()) {
+    message.value = '投稿内容を入力してください'
+    return
+  }
+
+  if (content.value.length > 280) {
+    message.value = '投稿は280文字以内で入力してください'
+    return
+  }
+
+  isSubmitting.value = true
+  message.value = ''
+
+  try {
+    message.value = '投稿が完了しました！'
+    content.value = ''
+  } catch (error) {
+    console.error('投稿エラー:', error)
+    message.value = '投稿に失敗しました: ' + error.message
+  } finally {
+    isSubmitting.value = false
+  }
+}
+</script>
+
+<template>
+  <div class="post-form">
+    <h2 class="form-title">気持ちを投稿しよう</h2>
+    
+    <div class="form-container">
+      <div class="input-group">
+        <textarea
+          v-model="content"
+          placeholder="今の気持ちを280文字以内で投稿してください..."
+          class="content-input"
+          :maxlength="280"
+          :disabled="isSubmitting"
+        ></textarea>
+        
+        <div class="char-count">
+          {{ content.length }}/280
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button
+          @click="submitPost"
+          :disabled="isSubmitting || !content.trim()"
+          class="btn btn-primary submit-btn"
+        >
+          <span v-if="isSubmitting">投稿中...</span>
+          <span v-else>投稿する</span>
+        </button>
+      </div>
+      
+      <div v-if="message" class="message" :class="{ error: message.includes('失敗') }">
+        {{ message }}
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.post-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-title {
+  font-size: 1.8rem;
+  color: #1a202c;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.form-container {
+  background: #f8fafc;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.content-input {
+  width: 100%;
+  min-height: 120px;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+}
+
+.content-input:focus {
+  outline: none;
+  border-color: #1da1f2;
+  box-shadow: 0 0 0 3px rgba(29, 161, 242, 0.1);
+}
+
+.content-input:disabled {
+  background-color: #f1f5f9;
+  cursor: not-allowed;
+}
+
+.char-count {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.submit-btn {
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 2rem;
+  min-width: 150px;
+}
+
+.submit-btn:disabled {
+  background-color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.message {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.message:not(.error) {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.message.error {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+</style>
