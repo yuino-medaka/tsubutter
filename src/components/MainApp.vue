@@ -1,11 +1,9 @@
 <script setup>
 import { ref } from 'vue'
-import PostForm from './PostForm.vue'
-import PostList from './PostList.vue'
 
 const appTitle = ref('ツブッター')
 const subtitle = ref('気持ちを投稿しよう')
-const activeTab = ref('posts') // 'posts' または 'post'
+const activeTab = ref('posts')
 
 const switchTab = (tab) => {
   activeTab.value = tab
@@ -49,12 +47,14 @@ const switchTab = (tab) => {
       <div class="container">
         <!-- 投稿一覧タブ -->
         <div v-if="activeTab === 'posts'" class="tab-content">
-          <PostList />
+          <h2>📝 投稿一覧</h2>
+          <p>投稿一覧がここに表示されます</p>
         </div>
         
         <!-- 投稿フォームタブ -->
         <div v-if="activeTab === 'post'" class="tab-content">
-          <PostForm />
+          <h2>✍️ 投稿する</h2>
+          <p>投稿フォームがここに表示されます</p>
         </div>
       </div>
     </main>
